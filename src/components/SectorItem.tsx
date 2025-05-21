@@ -44,7 +44,7 @@ const SectorItem: React.FC<SectorItemProps> = ({ setor, onChange, onDelete }) =>
             <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent-foreground" />
           </div>
           <h4 className="font-medium text-gray-700 text-xs sm:text-sm truncate max-w-[180px] sm:max-w-none">
-            {setor.nome || "Novo Setor"}
+            Novo Setor
           </h4>
         </div>
         <Button
@@ -133,7 +133,7 @@ const SectorItem: React.FC<SectorItemProps> = ({ setor, onChange, onDelete }) =>
               />
               <Button 
                 type="button" 
-                onClick={addField} 
+                onClick={addField}
                 variant="outline"
                 className="flex items-center border-primary/30 text-primary hover:bg-primary/5 hover:border-primary whitespace-nowrap h-9 sm:h-10 text-xs sm:text-sm"
                 disabled={!newField.trim()}
