@@ -1,9 +1,10 @@
 
 import React from "react";
-import { Company } from "@/types";
+import { Company, Sector } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Plus, X } from "lucide-react";
 import SectorItem from "./SectorItem";
 
@@ -15,9 +16,13 @@ interface CompanyItemProps {
 
 const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }) => {
   const addSector = () => {
-    const newSector = {
+    const newSector: Sector = {
       id: `sector-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       name: "",
+      description: "",
+      whenToTransfer: "",
+      fields: "",
+      responsiblePerson: "",
     };
     
     onChange(company.id, {
@@ -25,9 +30,9 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
     });
   };
 
-  const updateSector = (id: string, name: string) => {
+  const updateSector = (id: string, updatedSector: Partial<Sector>) => {
     const updatedSectors = company.sectors.map((sector) =>
-      sector.id === id ? { ...sector, name } : sector
+      sector.id === id ? { ...sector, ...updatedSector } : sector
     );
     
     onChange(company.id, { sectors: updatedSectors });
@@ -55,16 +60,33 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
         </div>
       </CardHeader>
       <CardContent className="pt-4">
-        <Input
-          placeholder="Nome da empresa"
-          value={company.name}
-          onChange={(e) => onChange(company.id, { name: e.target.value })}
-          className="mb-4"
-        />
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">Nome da Empresa</label>
+            <Input
+              placeholder="Nome da empresa"
+              value={company.name}
+              onChange={(e) => onChange(company.id, { name: e.target.value })}
+            />
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">Descrição Detalhada</label>
+            <Textarea
+              placeholder="Descrição detalhada da empresa"
+              value={company.description}
+              onChange={(e) => onChange(company.id, { description: e.target.value })}
+              className="resize-none h-32"
+            />
+            <p className="text-sm text-gray-500 mt-1 italic">
+              Ex: "Empresa especializada em tecnologia fundada em 2010, focada em soluções de software para o setor financeiro. Possui mais de 200 funcionários e atende clientes em todo o Brasil."
+            </p>
+          </div>
+        </div>
         
-        <div className="mt-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-medium text-sm text-blue-700">Setores</h3>
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-medium text-blue-700">Setores</h3>
             <Button
               variant="outline"
               size="sm"
@@ -76,19 +98,21 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
             </Button>
           </div>
           
-          <div className="pl-2 border-l-2 border-blue-100">
+          <div className="pl-2">
             {company.sectors.length > 0 ? (
-              company.sectors.map((sector) => (
-                <SectorItem
-                  key={sector.id}
-                  sector={sector}
-                  onChange={updateSector}
-                  onDelete={deleteSector}
-                />
-              ))
+              <div className="space-y-4">
+                {company.sectors.map((sector) => (
+                  <SectorItem
+                    key={sector.id}
+                    sector={sector}
+                    onChange={updateSector}
+                    onDelete={deleteSector}
+                  />
+                ))}
+              </div>
             ) : (
-              <p className="text-sm text-gray-500 italic">
-                Nenhum setor adicionado
+              <p className="text-sm text-gray-500 italic py-4 px-2 border border-dashed border-gray-300 rounded-md text-center">
+                Nenhum setor adicionado. Clique em "Adicionar Setor" para começar.
               </p>
             )}
           </div>

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Company } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import CompanyItem from "./CompanyItem";
@@ -15,6 +15,7 @@ const CompanyForm: React.FC = () => {
     const newCompany: Company = {
       id: `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       name: "",
+      description: "",
       sectors: [],
     };
     
@@ -40,13 +41,17 @@ const CompanyForm: React.FC = () => {
     const isValid = companies.every(
       (company) => 
         company.name.trim() !== "" && 
-        company.sectors.every((sector) => sector.name.trim() !== "")
+        company.sectors.every((sector) => 
+          sector.name.trim() !== "" && 
+          sector.description.trim() !== "" &&
+          sector.responsiblePerson.trim() !== ""
+        )
     );
     
     if (!isValid) {
       toast({
         title: "Dados incompletos",
-        description: "Preencha todos os campos de empresas e setores.",
+        description: "Preencha todos os campos obrigatórios (nome da empresa, nome do setor, descrição do setor e responsável).",
         variant: "destructive",
       });
       return;
@@ -75,7 +80,7 @@ const CompanyForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-blue-800">
             Empresas e Setores
