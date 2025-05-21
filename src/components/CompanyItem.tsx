@@ -46,70 +46,74 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
   };
 
   return (
-    <Card className="mb-8 border-l-4 border-l-primary shadow-md hover:shadow-lg transition-all duration-300">
-      <CardHeader className="bg-gradient-to-r from-secondary/70 to-secondary/20 pb-4 relative">
-        <div className="absolute top-0 right-0 p-2">
+    <Card className="mb-5 sm:mb-8 border-l-4 border-l-primary shadow-md hover:shadow-lg transition-all duration-300">
+      <CardHeader className="bg-gradient-to-r from-secondary/70 to-secondary/20 pb-3 sm:pb-4 relative p-3 sm:p-4">
+        <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => onDelete(company.id)}
-            className="text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors duration-200 rounded-full"
+            className="text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors duration-200 rounded-full h-6 w-6 sm:h-8 sm:w-8 p-0"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2 rounded-full">
-            <Building className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="bg-primary/10 p-1.5 sm:p-2 rounded-full">
+            <Building className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
-          <CardTitle className="text-lg font-semibold text-gray-800">Empresa: {company.empresa_nome || "Nova Empresa"}</CardTitle>
+          <CardTitle className="text-base sm:text-lg font-semibold text-gray-800 truncate">
+            {company.empresa_nome || "Nova Empresa"}
+          </CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 px-6">
-        <div className="space-y-5">
+      <CardContent className="p-3 sm:p-6">
+        <div className="space-y-4 sm:space-y-5">
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1.5">Nome da Empresa</label>
+            <label className="text-xs sm:text-sm font-medium text-gray-700 block mb-1 sm:mb-1.5">Nome da Empresa</label>
             <Input
               placeholder="Nome da empresa"
               value={company.empresa_nome}
               onChange={(e) => onChange(company.id, { empresa_nome: e.target.value })}
-              className="input-focus border-gray-300"
+              className="input-focus border-gray-300 h-9 sm:h-10 text-sm sm:text-base"
             />
           </div>
           
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1.5">Descrição da Empresa</label>
+            <label className="text-xs sm:text-sm font-medium text-gray-700 block mb-1 sm:mb-1.5">Descrição da Empresa</label>
             <Textarea
               placeholder="Descrição da empresa"
               value={company.empresa_descricao}
               onChange={(e) => onChange(company.id, { empresa_descricao: e.target.value })}
-              className="resize-none h-32 input-focus border-gray-300"
+              className="resize-none h-24 sm:h-32 input-focus border-gray-300 text-sm sm:text-base"
             />
           </div>
         </div>
         
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <div className="bg-accent/20 p-1.5 rounded-full">
-                <Briefcase className="h-4 w-4 text-accent-foreground" />
+        <div className="mt-6 sm:mt-8">
+          <div className="flex justify-between items-center mb-3 sm:mb-4">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="bg-accent/20 p-1 sm:p-1.5 rounded-full">
+                <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent-foreground" />
               </div>
-              <h3 className="font-medium text-gray-700">Setores da Empresa ({company.setores.length})</h3>
+              <h3 className="font-medium text-gray-700 text-sm sm:text-base">
+                Setores da Empresa ({company.setores.length})
+              </h3>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={addSetor}
-              className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
+              className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors h-8 sm:h-9 text-xs sm:text-sm"
             >
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-1" />
               Adicionar Setor
             </Button>
           </div>
           
-          <div className="pl-2">
+          <div className="pl-0 sm:pl-2">
             {company.setores.length > 0 ? (
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 {company.setores.map((setor) => (
                   <SectorItem
                     key={setor.id}
@@ -120,8 +124,8 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
                 ))}
               </div>
             ) : (
-              <div className="py-6 px-4 border border-dashed border-gray-300 rounded-lg text-center bg-gray-50/50">
-                <p className="text-gray-500 italic">
+              <div className="py-4 sm:py-6 px-3 sm:px-4 border border-dashed border-gray-300 rounded-lg text-center bg-gray-50/50">
+                <p className="text-gray-500 italic text-xs sm:text-sm">
                   Nenhum setor adicionado. Clique em "Adicionar Setor" para começar.
                 </p>
               </div>
@@ -129,15 +133,15 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
           </div>
         </div>
         
-        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-          <div></div> {/* Espaço vazio para manter o botão alinhado à direita */}
+        <div className="mt-4 sm:mt-6 pt-2 sm:pt-4 border-t border-gray-100 flex justify-end">
           <Button
             type="button"
             onClick={addSetor}
             className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
             variant="outline"
+            size="sm"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-1" />
             Adicionar Novo Setor
           </Button>
         </div>
