@@ -60,12 +60,13 @@ const CompanyForm: React.FC = () => {
       setores: [createEmptySetor()]
     };
     
-    setCompanies([newCompany, ...companies]);
+    // Adicionar a nova empresa ao final do array (no final da lista)
+    setCompanies([...companies, newCompany]);
     
-    // Rolagem para o início da página após adicionar uma nova empresa
+    // Rolar para o fim da página para mostrar a nova empresa
     setTimeout(() => {
       window.scrollTo({
-        top: 0,
+        top: document.documentElement.scrollHeight,
         behavior: 'smooth'
       });
     }, 100);
@@ -177,14 +178,10 @@ const CompanyForm: React.FC = () => {
         sectors: totalSectors
       });
       
-      // Mostrar a mensagem de sucesso com animação
+      // Mostrar a mensagem de sucesso com animação - permanentemente
       setShowSuccess(true);
       
-      // Depois de 5 segundos, recarregar os dados e esconder a mensagem
-      setTimeout(() => {
-        setShowSuccess(false);
-        fetchData();  // Recarregar dados do banco
-      }, 5000);
+      // Removi o setTimeout para que a mensagem permaneça até ação do usuário
       
     } catch (error: any) {
       toast({
