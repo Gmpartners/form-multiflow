@@ -4,16 +4,21 @@ export interface SectorField {
   name: string;
 }
 
-export interface CompanySector {
+export interface Sector {
+  id: string;
+  nome: string;
+  descricao: string;
+  quando_transferir: string;
+  responsavel_nome: string;
+  responsavel_email: string;
+  campos: SectorField[];
+}
+
+export interface CompanyWithSectors {
   id: string;
   empresa_nome: string;
   empresa_descricao: string;
-  setor_nome: string;
-  setor_descricao: string;
-  setor_quando_transferir: string;
-  setor_responsavel_nome: string;
-  setor_responsavel_email: string;
-  setor_campos: SectorField[];
+  setores: Sector[];
   created_at?: string;
   updated_at?: string;
 }

@@ -1,6 +1,6 @@
 
 import React from "react";
-import CompanySectorForm from "@/components/CompanySectorForm";
+import CompanyForm from "@/components/CompanyForm";
 
 const Index = () => {
   return (
@@ -21,7 +21,7 @@ const Index = () => {
           </p>
         </header>
 
-        <CompanySectorForm />
+        <CompanyForm />
         
         <footer className="mt-16 text-center text-gray-500 text-sm">
           <p>© {new Date().getFullYear()} GM Partners | Sistema de Gestão Empresarial</p>

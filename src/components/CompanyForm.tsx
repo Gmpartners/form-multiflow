@@ -1,98 +1,43 @@
 
 import React, { useState, useEffect } from "react";
-import { Company, Sector, SectorField } from "@/types";
+import { CompanyWithSectors, Sector, SectorField } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Building } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import CompanyItem from "./CompanyItem";
-import { supabaseAdmin } from "@/integrations/supabase/client";
-import { getClientId } from "@/lib/clientManager";
+import { supabase } from "@/integrations/supabase/client";
 
 const CompanyForm: React.FC = () => {
   const { toast } = useToast();
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<CompanyWithSectors[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [clientId, setClientId] = useState<string | null>(null);
 
-  // Obter o ID do cliente ao montar o componente
+  // Carregar dados do Supabase quando o componente for montado
   useEffect(() => {
-    const initClient = async () => {
-      const id = await getClientId();
-      setClientId(id);
-    };
-    
-    initClient();
-  }, []);
-
-  // Carregar empresas do Supabase quando o componente for montado e o clientId estiver disponível
-  useEffect(() => {
-    if (!clientId) return;
-    
-    const fetchCompanies = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Buscar todas as empresas do cliente atual
-        const { data: companiesData, error: companiesError } = await supabaseAdmin
-          .from('companies')
-          .select('id, name, description, created_at')
-          .eq('client_id', clientId);
+        // Buscar todos os registros
+        const { data, error } = await supabase
+          .from('companies_with_sectors')
+          .select('*')
+          .order('created_at', { ascending: false });
         
-        if (companiesError) throw companiesError;
+        if (error) throw error;
         
-        // Para cada empresa, buscar seus setores
-        const companiesWithSectors = await Promise.all(companiesData.map(async (company) => {
-          // Buscar setores da empresa
-          const { data: sectorsData, error: sectorsError } = await supabaseAdmin
-            .from('sectors')
-            .select('id, name, description, when_to_transfer, responsible_person, responsible_email')
-            .eq('company_id', company.id);
-          
-          if (sectorsError) throw sectorsError;
-          
-          // Para cada setor, buscar seus campos
-          const sectorsWithFields = await Promise.all(sectorsData.map(async (sector) => {
-            // Buscar campos do setor
-            const { data: fieldsData, error: fieldsError } = await supabaseAdmin
-              .from('sector_fields')
-              .select('id, field_name')
-              .eq('sector_id', sector.id);
-            
-            if (fieldsError) throw fieldsError;
-            
-            // Converter o formato do banco para o formato da aplicação
-            const formattedFields: SectorField[] = fieldsData.map(field => ({
-              id: field.id,
-              name: field.field_name
-            }));
-            
-            // Retornar o setor com seus campos
-            return {
-              id: sector.id,
-              name: sector.name,
-              description: sector.description,
-              whenToTransfer: sector.when_to_transfer,
-              responsiblePerson: sector.responsible_person,
-              responsibleEmail: sector.responsible_email,
-              fields: formattedFields
-            } as Sector;
-          }));
-          
-          // Retornar a empresa com seus setores
-          return {
-            id: company.id,
-            name: company.name,
-            description: company.description,
-            sectors: sectorsWithFields
-          } as Company;
+        // Garantir que setores seja um array
+        const formattedData = data.map(item => ({
+          ...item,
+          setores: Array.isArray(item.setores) ? item.setores : []
         }));
         
-        setCompanies(companiesWithSectors);
+        setCompanies(formattedData);
       } catch (error: any) {
         toast({
           title: "Erro ao carregar dados",
-          description: error.message || "Não foi possível carregar as empresas e setores.",
+          description: error.message || "Não foi possível carregar as empresas.",
           variant: "destructive",
         });
         console.error("Erro ao buscar dados:", error);
@@ -101,29 +46,41 @@ const CompanyForm: React.FC = () => {
       }
     };
 
-    fetchCompanies();
-  }, [toast, clientId]);
+    fetchData();
+  }, [toast]);
 
   const addCompany = () => {
-    const newCompany: Company = {
+    const newCompany: CompanyWithSectors = {
       id: `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      name: "",
-      description: "",
-      sectors: [],
+      empresa_nome: "",
+      empresa_descricao: "",
+      setores: [createEmptySetor()]
     };
     
-    setCompanies([...companies, newCompany]);
+    setCompanies([newCompany, ...companies]);
     
-    // Rolagem para o fim da página após adicionar uma nova empresa
+    // Rolagem para o início da página após adicionar uma nova empresa
     setTimeout(() => {
       window.scrollTo({
-        top: document.documentElement.scrollHeight,
+        top: 0,
         behavior: 'smooth'
       });
     }, 100);
   };
 
-  const updateCompany = (id: string, updatedCompany: Partial<Company>) => {
+  const createEmptySetor = (): Sector => {
+    return {
+      id: `setor-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      nome: "",
+      descricao: "",
+      quando_transferir: "",
+      responsavel_nome: "",
+      responsavel_email: "",
+      campos: []
+    };
+  };
+
+  const updateCompany = (id: string, updatedCompany: Partial<CompanyWithSectors>) => {
     setCompanies(
       companies.map((company) =>
         company.id === id ? { ...company, ...updatedCompany } : company
@@ -138,22 +95,13 @@ const CompanyForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!clientId) {
-      toast({
-        title: "Erro de identificação",
-        description: "Não foi possível identificar o cliente. Recarregue a página e tente novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validação básica - notificação mais amigável
+    // Validação básica
     const isValid = companies.every(
       (company) => 
-        company.name.trim() !== "" && 
-        company.sectors.every((sector) => 
-          sector.name.trim() !== "" && 
-          sector.responsiblePerson.trim() !== ""
+        company.empresa_nome.trim() !== "" && 
+        company.setores.every((setor) => 
+          setor.nome.trim() !== "" && 
+          setor.responsavel_nome.trim() !== ""
         )
     );
     
@@ -161,7 +109,7 @@ const CompanyForm: React.FC = () => {
       toast({
         title: "Dados incompletos",
         description: "Por favor, preencha pelo menos o nome da empresa, nome do setor e responsável.",
-        variant: "default", // Mudado de destructive para default
+        variant: "default",
       });
       return;
     }
@@ -169,8 +117,8 @@ const CompanyForm: React.FC = () => {
     if (companies.length === 0) {
       toast({
         title: "Nenhuma empresa",
-        description: "Adicione pelo menos uma empresa ao formulário.",
-        variant: "default", // Mudado de destructive para default
+        description: "Adicione pelo menos uma empresa para salvar.",
+        variant: "default",
       });
       return;
     }
@@ -178,105 +126,41 @@ const CompanyForm: React.FC = () => {
     setSaving(true);
     
     try {
-      // Salvar cada empresa e seus dados relacionados
+      // Salvar cada empresa com seus setores
       for (const company of companies) {
-        // Verificar se a empresa já existe (tem UUID válido do banco)
+        // Verificar se é uma nova empresa ou uma existente
         const isNewCompany = company.id.startsWith('company-');
         
-        let companyId = company.id;
-        
-        // Se for uma nova empresa, inserir no banco
         if (isNewCompany) {
-          const { data, error } = await supabaseAdmin
-            .from('companies')
+          // Inserir nova empresa
+          const { error } = await supabase
+            .from('companies_with_sectors')
             .insert({
-              name: company.name,
-              description: company.description,
-              client_id: clientId
-            })
-            .select('id')
-            .single();
+              empresa_nome: company.empresa_nome,
+              empresa_descricao: company.empresa_descricao,
+              setores: company.setores
+            });
           
           if (error) throw error;
-          companyId = data.id;
         } else {
           // Atualizar empresa existente
-          const { error } = await supabaseAdmin
-            .from('companies')
+          const { error } = await supabase
+            .from('companies_with_sectors')
             .update({
-              name: company.name,
-              description: company.description,
+              empresa_nome: company.empresa_nome,
+              empresa_descricao: company.empresa_descricao,
+              setores: company.setores
             })
             .eq('id', company.id);
           
           if (error) throw error;
-        }
-        
-        // Processar cada setor da empresa
-        for (const sector of company.sectors) {
-          const isNewSector = sector.id.startsWith('sector-');
-          let sectorId = sector.id;
-          
-          // Se for um novo setor, inserir no banco
-          if (isNewSector) {
-            const { data, error } = await supabaseAdmin
-              .from('sectors')
-              .insert({
-                company_id: companyId,
-                name: sector.name,
-                description: sector.description,
-                when_to_transfer: sector.whenToTransfer,
-                responsible_person: sector.responsiblePerson,
-                responsible_email: sector.responsibleEmail,
-              })
-              .select('id')
-              .single();
-            
-            if (error) throw error;
-            sectorId = data.id;
-          } else {
-            // Atualizar setor existente
-            const { error } = await supabaseAdmin
-              .from('sectors')
-              .update({
-                company_id: companyId,
-                name: sector.name,
-                description: sector.description,
-                when_to_transfer: sector.whenToTransfer,
-                responsible_person: sector.responsiblePerson,
-                responsible_email: sector.responsibleEmail,
-              })
-              .eq('id', sector.id);
-            
-            if (error) throw error;
-            
-            // Apagar campos existentes para reinseri-los (mais simples que comparar e atualizar)
-            await supabaseAdmin
-              .from('sector_fields')
-              .delete()
-              .eq('sector_id', sectorId);
-          }
-          
-          // Inserir todos os campos do setor
-          if (sector.fields && sector.fields.length > 0) {
-            const fieldsToInsert = sector.fields.map(field => ({
-              sector_id: sectorId,
-              field_name: field.name,
-            }));
-            
-            const { error } = await supabaseAdmin
-              .from('sector_fields')
-              .insert(fieldsToInsert);
-            
-            if (error) throw error;
-          }
         }
       }
       
       toast({
         title: "Dados salvos com sucesso",
         description: `${companies.length} empresas e ${companies.reduce(
-          (total, company) => total + company.sectors.length,
+          (total, company) => total + company.setores.length,
           0
         )} setores registrados com sucesso!`,
       });
@@ -301,15 +185,16 @@ const CompanyForm: React.FC = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-primary">
-            Gerenciar Empresas
+            Empresas e Setores
           </h2>
           <Button
             type="button"
             onClick={addCompany}
             className="flex items-center bg-primary hover:bg-primary/90 shadow-md"
-            disabled={loading || saving || !clientId}
+            disabled={loading || saving}
           >
             <Plus className="h-4 w-4 mr-2" />
+            <Building className="h-4 w-4 mr-2" />
             Adicionar Empresa
           </Button>
         </div>
@@ -327,7 +212,7 @@ const CompanyForm: React.FC = () => {
               <Card className="border-dashed border-2 border-gray-200 shadow-inner bg-gray-50/50">
                 <CardContent className="py-12 flex flex-col items-center justify-center text-center">
                   <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                    <Plus className="h-8 w-8 text-primary" />
+                    <Building className="h-8 w-8 text-primary" />
                   </div>
                   <p className="text-gray-500 mb-4 text-lg">
                     Nenhuma empresa adicionada ainda
@@ -337,7 +222,6 @@ const CompanyForm: React.FC = () => {
                     variant="outline"
                     onClick={addCompany}
                     className="flex items-center border-primary text-primary hover:bg-primary/10"
-                    disabled={!clientId}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Adicionar Primeira Empresa
@@ -355,7 +239,7 @@ const CompanyForm: React.FC = () => {
               />
             ))}
             
-            {/* Botão adicional para adicionar empresa na parte inferior da página */}
+            {/* Botão adicional para adicionar mais empresas */}
             {companies.length > 0 && (
               <div className="flex justify-center pt-4">
                 <Button
@@ -363,9 +247,10 @@ const CompanyForm: React.FC = () => {
                   onClick={addCompany}
                   variant="outline"
                   className="flex items-center border-primary text-primary hover:bg-primary/10 px-6"
-                  disabled={loading || saving || !clientId}
+                  disabled={loading || saving}
                 >
                   <Plus className="h-4 w-4 mr-2" />
+                  <Building className="h-4 w-4 mr-2" />
                   Adicionar Nova Empresa
                 </Button>
               </div>
@@ -378,7 +263,7 @@ const CompanyForm: React.FC = () => {
         <Button 
           type="submit" 
           className="bg-success hover:bg-success/90 text-white px-6 py-5 text-base font-medium shadow-lg transition-all hover:scale-105"
-          disabled={companies.length === 0 || loading || saving || !clientId}
+          disabled={companies.length === 0 || loading || saving}
         >
           {saving ? (
             <>

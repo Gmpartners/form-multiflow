@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Company, Sector, SectorField } from "@/types";
+import { CompanyWithSectors, Sector } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,39 +9,39 @@ import { Plus, X, Building, Briefcase } from "lucide-react";
 import SectorItem from "./SectorItem";
 
 interface CompanyItemProps {
-  company: Company;
-  onChange: (id: string, updatedCompany: Partial<Company>) => void;
+  company: CompanyWithSectors;
+  onChange: (id: string, updatedCompany: Partial<CompanyWithSectors>) => void;
   onDelete: (id: string) => void;
 }
 
 const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }) => {
-  const addSector = () => {
-    const newSector: Sector = {
-      id: `sector-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      name: "",
-      description: "",
-      whenToTransfer: "",
-      fields: [],
-      responsiblePerson: "",
-      responsibleEmail: "",
+  const addSetor = () => {
+    const newSetor: Sector = {
+      id: `setor-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      nome: "",
+      descricao: "",
+      quando_transferir: "",
+      responsavel_nome: "",
+      responsavel_email: "",
+      campos: [],
     };
     
     onChange(company.id, {
-      sectors: [...company.sectors, newSector],
+      setores: [...company.setores, newSetor],
     });
   };
 
-  const updateSector = (id: string, updatedSector: Partial<Sector>) => {
-    const updatedSectors = company.sectors.map((sector) =>
-      sector.id === id ? { ...sector, ...updatedSector } : sector
+  const updateSetor = (id: string, updatedSetor: Partial<Sector>) => {
+    const updatedSetores = company.setores.map((setor) =>
+      setor.id === id ? { ...setor, ...updatedSetor } : setor
     );
     
-    onChange(company.id, { sectors: updatedSectors });
+    onChange(company.id, { setores: updatedSetores });
   };
 
-  const deleteSector = (id: string) => {
+  const deleteSetor = (id: string) => {
     onChange(company.id, {
-      sectors: company.sectors.filter((sector) => sector.id !== id),
+      setores: company.setores.filter((setor) => setor.id !== id),
     });
   };
 
@@ -62,7 +62,7 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
           <div className="bg-primary/10 p-2 rounded-full">
             <Building className="h-5 w-5 text-primary" />
           </div>
-          <CardTitle className="text-lg font-semibold text-gray-800">Dados da Empresa</CardTitle>
+          <CardTitle className="text-lg font-semibold text-gray-800">Empresa: {company.empresa_nome || "Nova Empresa"}</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6 px-6">
@@ -71,8 +71,8 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Nome da Empresa</label>
             <Input
               placeholder="Nome da empresa"
-              value={company.name}
-              onChange={(e) => onChange(company.id, { name: e.target.value })}
+              value={company.empresa_nome}
+              onChange={(e) => onChange(company.id, { empresa_nome: e.target.value })}
               className="input-focus border-gray-300"
             />
           </div>
@@ -81,8 +81,8 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Descrição da Empresa</label>
             <Textarea
               placeholder="Descrição da empresa"
-              value={company.description}
-              onChange={(e) => onChange(company.id, { description: e.target.value })}
+              value={company.empresa_descricao}
+              onChange={(e) => onChange(company.id, { empresa_descricao: e.target.value })}
               className="resize-none h-32 input-focus border-gray-300"
             />
           </div>
@@ -94,12 +94,12 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
               <div className="bg-accent/20 p-1.5 rounded-full">
                 <Briefcase className="h-4 w-4 text-accent-foreground" />
               </div>
-              <h3 className="font-medium text-gray-700">Setores da Empresa</h3>
+              <h3 className="font-medium text-gray-700">Setores da Empresa ({company.setores.length})</h3>
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={addSector}
+              onClick={addSetor}
               className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
             >
               <Plus className="h-4 w-4 mr-1" />
@@ -108,14 +108,14 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
           </div>
           
           <div className="pl-2">
-            {company.sectors.length > 0 ? (
+            {company.setores.length > 0 ? (
               <div className="space-y-5">
-                {company.sectors.map((sector) => (
+                {company.setores.map((setor) => (
                   <SectorItem
-                    key={sector.id}
-                    sector={sector}
-                    onChange={updateSector}
-                    onDelete={deleteSector}
+                    key={setor.id}
+                    setor={setor}
+                    onChange={updateSetor}
+                    onDelete={deleteSetor}
                   />
                 ))}
               </div>
@@ -133,7 +133,7 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
           <div></div> {/* Espaço vazio para manter o botão alinhado à direita */}
           <Button
             type="button"
-            onClick={addSector}
+            onClick={addSetor}
             className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
             variant="outline"
           >

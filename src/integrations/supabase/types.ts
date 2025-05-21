@@ -9,17 +9,12 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      company_sectors: {
+      companies_with_sectors: {
         Row: {
           id: string
           empresa_nome: string
           empresa_descricao: string
-          setor_nome: string
-          setor_descricao: string
-          setor_quando_transferir: string
-          setor_responsavel_nome: string
-          setor_responsavel_email: string
-          setor_campos: Json
+          setores: Json
           created_at: string
           updated_at: string
         }
@@ -27,12 +22,7 @@ export type Database = {
           id?: string
           empresa_nome: string
           empresa_descricao?: string
-          setor_nome: string
-          setor_descricao?: string
-          setor_quando_transferir?: string
-          setor_responsavel_nome?: string
-          setor_responsavel_email?: string
-          setor_campos?: Json
+          setores?: Json
           created_at?: string
           updated_at?: string
         }
@@ -40,12 +30,7 @@ export type Database = {
           id?: string
           empresa_nome?: string
           empresa_descricao?: string
-          setor_nome?: string
-          setor_descricao?: string
-          setor_quando_transferir?: string
-          setor_responsavel_nome?: string
-          setor_responsavel_email?: string
-          setor_campos?: Json
+          setores?: Json
           created_at?: string
           updated_at?: string
         }

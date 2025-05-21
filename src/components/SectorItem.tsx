@@ -8,32 +8,31 @@ import { Plus, X, Tag, Users, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface SectorItemProps {
-  sector: Sector;
-  onChange: (id: string, updatedSector: Partial<Sector>) => void;
+  setor: Sector;
+  onChange: (id: string, updatedSetor: Partial<Sector>) => void;
   onDelete: (id: string) => void;
 }
 
-const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) => {
+const SectorItem: React.FC<SectorItemProps> = ({ setor, onChange, onDelete }) => {
   const [newField, setNewField] = useState("");
 
   const addField = () => {
     if (!newField.trim()) return;
     
     const newSectorField: SectorField = {
-      id: `field-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       name: newField.trim(),
     };
     
-    onChange(sector.id, { 
-      fields: [...(sector.fields || []), newSectorField] 
+    onChange(setor.id, { 
+      campos: [...(setor.campos || []), newSectorField] 
     });
     
     setNewField("");
   };
 
-  const removeField = (fieldId: string) => {
-    onChange(sector.id, {
-      fields: sector.fields.filter((field) => field.id !== fieldId)
+  const removeField = (fieldIndex: number) => {
+    onChange(setor.id, {
+      campos: setor.campos.filter((_, index) => index !== fieldIndex)
     });
   };
 
@@ -44,12 +43,12 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
           <div className="bg-accent/20 p-1.5 rounded-full">
             <Users className="h-4 w-4 text-accent-foreground" />
           </div>
-          <h4 className="font-medium text-gray-700">Detalhes do Setor</h4>
+          <h4 className="font-medium text-gray-700">Setor: {setor.nome || "Novo Setor"}</h4>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => onDelete(sector.id)}
+          onClick={() => onDelete(setor.id)}
           className="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full h-8 w-8"
         >
           <X className="h-4 w-4" />
@@ -61,8 +60,8 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
           <label className="text-sm font-medium text-gray-700 block mb-1.5">Nome do Setor</label>
           <Input
             placeholder="Nome do setor"
-            value={sector.name}
-            onChange={(e) => onChange(sector.id, { name: e.target.value })}
+            value={setor.nome}
+            onChange={(e) => onChange(setor.id, { nome: e.target.value })}
             className="input-focus border-gray-300"
           />
         </div>
@@ -70,9 +69,9 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
         <div>
           <label className="text-sm font-medium text-gray-700 block mb-1.5">Descrição do Setor</label>
           <Textarea
-            placeholder="Descreva as responsabilidades e funções deste setor"
-            value={sector.description}
-            onChange={(e) => onChange(sector.id, { description: e.target.value })}
+            placeholder="Descrição do setor"
+            value={setor.descricao}
+            onChange={(e) => onChange(setor.id, { descricao: e.target.value })}
             className="resize-none h-24 input-focus border-gray-300"
           />
         </div>
@@ -81,10 +80,39 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
           <label className="text-sm font-medium text-gray-700 block mb-1.5">Quando Transferir</label>
           <Textarea
             placeholder="Tipos de problemas que este setor resolve"
-            value={sector.whenToTransfer}
-            onChange={(e) => onChange(sector.id, { whenToTransfer: e.target.value })}
+            value={setor.quando_transferir}
+            onChange={(e) => onChange(setor.id, { quando_transferir: e.target.value })}
             className="resize-none h-20 input-focus border-gray-300"
           />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1.5 flex items-center gap-1.5">
+              <Users className="h-4 w-4 text-primary" />
+              <span>Responsável pelo Setor</span>
+            </label>
+            <Input
+              placeholder="Nome do responsável"
+              value={setor.responsavel_nome}
+              onChange={(e) => onChange(setor.id, { responsavel_nome: e.target.value })}
+              className="input-focus border-gray-300"
+            />
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1.5 flex items-center gap-1.5">
+              <Mail className="h-4 w-4 text-primary" />
+              <span>E-mail do Responsável</span>
+            </label>
+            <Input
+              placeholder="email@exemplo.com"
+              value={setor.responsavel_email}
+              onChange={(e) => onChange(setor.id, { responsavel_email: e.target.value })}
+              className="input-focus border-gray-300"
+              type="email"
+            />
+          </div>
         </div>
         
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -106,7 +134,7 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
                 type="button" 
                 onClick={addField} 
                 variant="outline"
-                className="flex items-center border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
+                className="flex items-center border-primary/30 text-primary hover:bg-primary/5 hover:border-primary whitespace-nowrap"
                 disabled={!newField.trim()}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -114,17 +142,17 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
               </Button>
             </div>
             
-            {sector.fields && sector.fields.length > 0 ? (
+            {setor.campos && setor.campos.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-3 p-3 bg-white rounded-md border border-gray-100">
-                {sector.fields.map((field) => (
+                {setor.campos.map((field, index) => (
                   <Badge 
-                    key={field.id} 
+                    key={index} 
                     variant="secondary"
                     className="px-3 py-1.5 flex items-center gap-1.5 bg-secondary text-secondary-foreground"
                   >
                     {field.name}
                     <button
-                      onClick={() => removeField(field.id)}
+                      onClick={() => removeField(index)}
                       className="ml-1 bg-secondary-foreground/10 rounded-full h-4 w-4 flex items-center justify-center hover:bg-secondary-foreground/20 transition-colors"
                       aria-label={`Remover campo ${field.name}`}
                     >
@@ -138,35 +166,6 @@ const SectorItem: React.FC<SectorItemProps> = ({ sector, onChange, onDelete }) =
                 Nenhum campo adicionado ainda.
               </div>
             )}
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1.5 flex items-center gap-1.5">
-              <Users className="h-4 w-4 text-primary" />
-              <span>Responsável pelo Setor</span>
-            </label>
-            <Input
-              placeholder="Nome do responsável"
-              value={sector.responsiblePerson}
-              onChange={(e) => onChange(sector.id, { responsiblePerson: e.target.value })}
-              className="input-focus border-gray-300"
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1.5 flex items-center gap-1.5">
-              <Mail className="h-4 w-4 text-primary" />
-              <span>E-mail do Responsável</span>
-            </label>
-            <Input
-              placeholder="email@exemplo.com"
-              value={sector.responsibleEmail || ""}
-              onChange={(e) => onChange(sector.id, { responsibleEmail: e.target.value })}
-              className="input-focus border-gray-300"
-              type="email"
-            />
           </div>
         </div>
       </div>
