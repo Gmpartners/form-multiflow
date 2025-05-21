@@ -1,73 +1,28 @@
-# Welcome to your Lovable project
+# Form MultiFlow
 
-## Project info
+Um formulário simples para cadastro de empresas e setores para o sistema MultiFlow.
 
-**URL**: https://lovable.dev/projects/26807a40-fb4f-4dd4-ad6d-03821cad0cb2
+## Tecnologias
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/26807a40-fb4f-4dd4-ad6d-03821cad0cb2) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
 - React
-- shadcn-ui
+- TypeScript
+- Vite
+- Shadcn/UI
 - Tailwind CSS
+- Supabase
 
-## How can I deploy this project?
+## Descrição
 
-Simply open [Lovable](https://lovable.dev/projects/26807a40-fb4f-4dd4-ad6d-03821cad0cb2) and click on Share -> Publish.
+Esta aplicação permite cadastrar empresas e seus respectivos setores em uma estrutura de banco de dados simplificada. Todos os dados são armazenados em uma única tabela para facilitar a consulta e o gerenciamento.
 
-## Can I connect a custom domain to my Lovable project?
+## Funcionalidades
 
-Yes, you can!
+- Cadastro de empresas com nome e descrição
+- Cadastro de setores com nome, descrição e responsável
+- Adição de campos personalizados para cada setor
+- Interface responsiva e intuitiva
+- Armazenamento dos dados no Supabase
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Deploy
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Este projeto está hospedado na Vercel.

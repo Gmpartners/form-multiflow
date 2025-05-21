@@ -1,21 +1,19 @@
 
 export interface SectorField {
-  id: string;
+  id?: string;
   name: string;
 }
 
-export interface Sector {
+export interface CompanySector {
   id: string;
-  name: string;
-  description: string;
-  whenToTransfer: string;
-  fields: SectorField[];
-  responsiblePerson: string;
-}
-
-export interface Company {
-  id: string;
-  name: string;
-  description: string;
-  sectors: Sector[];
+  empresa_nome: string;
+  empresa_descricao: string;
+  setor_nome: string;
+  setor_descricao: string;
+  setor_quando_transferir: string;
+  setor_responsavel_nome: string;
+  setor_responsavel_email: string;
+  setor_campos: SectorField[];
+  created_at?: string;
+  updated_at?: string;
 }

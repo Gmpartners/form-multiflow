@@ -2,10 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://tfclxyrolwvzchblzzsh.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmY2x4eXJvbHd2emNoYmx6enNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3ODg0ODQsImV4cCI6MjA2MzM2NDQ4NH0.pwJ8N7mxHv_7eqGA60kEhuJwtPIZDOfrHuMFjyrXk3c";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://tfclxyrolwvzchblzzsh.supabase.co";
+const SUPABASE_SERVICE_KEY = import.meta.env.VITE_SUPABASE_SERVICE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmY2x4eXJvbHd2emNoYmx6enNoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Nzc4ODQ4NCwiZXhwIjoyMDYzMzY0NDg0fQ.J0U8cN2sIiGU0Snl3nYk9E05exWA09DRin_NNOiHB-I";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Usar o service role para todas as operações
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_KEY);
