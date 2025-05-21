@@ -21,6 +21,24 @@ const Index = () => {
           </p>
         </header>
 
+        {/* Card explicativo simplificado sem mencionar campos obrigatórios */}
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 sm:mb-10 rounded-r-md shadow-sm">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm sm:text-base text-blue-700">
+                <strong>Como utilizar:</strong> Adicione empresas clicando no botão "Adicionar Empresa". Para cada empresa, você pode adicionar um ou mais setores. Quando finalizar, clique em "Salvar Dados".
+              </p>
+            </div>
+          </div>
+        </div>
+
         <CompanyForm />
         
         <footer className="mt-10 sm:mt-16 text-center text-gray-500 text-xs sm:text-sm">

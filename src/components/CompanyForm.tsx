@@ -18,47 +18,15 @@ const CompanyForm: React.FC = () => {
   const [totalSaved, setTotalSaved] = useState({ companies: 0, sectors: 0 });
   const lastCompanyRef = useRef<HTMLDivElement>(null);
 
-  // Carregar dados do Supabase quando o componente for montado
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Buscar todos os registros
-      const { data, error } = await supabase
-        .from('companies_with_sectors')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      // Garantir que setores seja um array
-      const formattedData = data.map(item => ({
-        ...item,
-        setores: Array.isArray(item.setores) ? item.setores : []
-      }));
-      
-      setCompanies(formattedData);
-    } catch (error: any) {
-      toast({
-        title: "Erro ao carregar dados",
-        description: error.message || "Não foi possível carregar as empresas.",
-        variant: "destructive",
-      });
-      console.error("Erro ao buscar dados:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Removido carregamento automático dos dados do Supabase
+  // O formulário inicia vazio para todos os usuários
 
   const addCompany = () => {
     const newCompany: CompanyWithSectors = {
       id: `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       empresa_nome: "",
       empresa_descricao: "",
-      setores: [createEmptySetor()]
+      setores: [] // Agora inicia com array vazio, sem setor automático
     };
     
     // Adicionar a nova empresa ao final do array (no final da lista)
@@ -111,24 +79,7 @@ const CompanyForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validação básica
-    const isValid = companies.every(
-      (company) => 
-        company.empresa_nome.trim() !== "" && 
-        company.setores.every((setor) => 
-          setor.nome.trim() !== "" && 
-          setor.responsavel_nome.trim() !== ""
-        )
-    );
-    
-    if (!isValid) {
-      toast({
-        title: "Dados incompletos",
-        description: "Por favor, preencha pelo menos o nome da empresa, nome do setor e responsável.",
-        variant: "default",
-      });
-      return;
-    }
+    // Removida a validação obrigatória dos campos
     
     if (companies.length === 0) {
       toast({
@@ -152,9 +103,13 @@ const CompanyForm: React.FC = () => {
           const { error } = await supabase
             .from('companies_with_sectors')
             .insert({
-              empresa_nome: company.empresa_nome,
-              empresa_descricao: company.empresa_descricao,
-              setores: company.setores
+              empresa_nome: company.empresa_nome || "Empresa sem nome", // Valor padrão caso esteja vazio
+              empresa_descricao: company.empresa_descricao || "",
+              setores: company.setores.map(setor => ({
+                ...setor,
+                nome: setor.nome || "Setor sem nome", // Valor padrão caso esteja vazio
+                responsavel_nome: setor.responsavel_nome || "Responsável não definido" // Valor padrão caso esteja vazio
+              }))
             });
           
           if (error) throw error;
@@ -163,9 +118,13 @@ const CompanyForm: React.FC = () => {
           const { error } = await supabase
             .from('companies_with_sectors')
             .update({
-              empresa_nome: company.empresa_nome,
-              empresa_descricao: company.empresa_descricao,
-              setores: company.setores
+              empresa_nome: company.empresa_nome || "Empresa sem nome", // Valor padrão caso esteja vazio
+              empresa_descricao: company.empresa_descricao || "",
+              setores: company.setores.map(setor => ({
+                ...setor,
+                nome: setor.nome || "Setor sem nome", // Valor padrão caso esteja vazio
+                responsavel_nome: setor.responsavel_nome || "Responsável não definido" // Valor padrão caso esteja vazio
+              }))
             })
             .eq('id', company.id);
           

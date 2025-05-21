@@ -125,26 +125,37 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
               </div>
             ) : (
               <div className="py-4 sm:py-6 px-3 sm:px-4 border border-dashed border-gray-300 rounded-lg text-center bg-gray-50/50">
-                <p className="text-gray-500 italic text-xs sm:text-sm">
-                  Nenhum setor adicionado. Clique em "Adicionar Setor" para começar.
+                <p className="text-gray-500 text-xs sm:text-sm mb-3">
+                  Esta empresa ainda não possui setores. Adicione um setor para prosseguir.
                 </p>
+                <Button
+                  type="button"
+                  onClick={addSetor}
+                  className="bg-accent/10 hover:bg-accent/20 text-accent-foreground text-xs sm:text-sm"
+                  size="sm"
+                >
+                  <Plus className="h-3 w-3 mr-1 sm:h-3.5 sm:w-3.5 sm:mr-1" />
+                  Adicionar Primeiro Setor
+                </Button>
               </div>
             )}
           </div>
         </div>
         
-        <div className="mt-4 sm:mt-6 pt-2 sm:pt-4 border-t border-gray-100 flex justify-end">
-          <Button
-            type="button"
-            onClick={addSetor}
-            className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
-            variant="outline"
-            size="sm"
-          >
-            <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-1" />
-            Adicionar Novo Setor
-          </Button>
-        </div>
+        {company.setores.length > 0 && (
+          <div className="mt-4 sm:mt-6 pt-2 sm:pt-4 border-t border-gray-100 flex justify-end">
+            <Button
+              type="button"
+              onClick={addSetor}
+              className="flex items-center text-primary border-primary/30 hover:bg-primary/5 hover:border-primary transition-colors"
+              variant="outline"
+              size="sm"
+            >
+              <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-1" />
+              Adicionar Novo Setor
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
