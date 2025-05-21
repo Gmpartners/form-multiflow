@@ -16,7 +16,7 @@ const CompanyForm: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [totalSaved, setTotalSaved] = useState({ companies: 0, sectors: 0 });
-  const endOfCompaniesRef = useRef<HTMLDivElement>(null);
+  const lastCompanyRef = useRef<HTMLDivElement>(null);
 
   // Carregar dados do Supabase quando o componente for montado
   useEffect(() => {
@@ -64,19 +64,17 @@ const CompanyForm: React.FC = () => {
     // Adicionar a nova empresa ao final do array (no final da lista)
     setCompanies([...companies, newCompany]);
     
-    // Usar um timeout para esperar o DOM ser atualizado
+    // Resolver o problema de scroll
     setTimeout(() => {
-      // Scroll suave até o final da lista de empresas (usando o ref)
-      if (endOfCompaniesRef.current) {
-        // Calcular a posição para um scroll suave
-        const yOffset = -80; // Ajustar conforme necessário para ver um pouco do contexto acima
-        const y = endOfCompaniesRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        
-        window.scrollTo({
-          top: y,
-          behavior: 'smooth'
-        });
-      }
+      // Calcular a posição para fazer um scroll suave de apenas 200-300px
+      // Isso evita um scroll completo até o fim da página
+      const currentScrollPosition = window.scrollY;
+      const scrollAmount = 250; // Ajuste esse valor conforme necessário
+      
+      window.scrollTo({
+        top: currentScrollPosition + scrollAmount,
+        behavior: 'smooth'
+      });
     }, 100);
   };
 
@@ -285,17 +283,15 @@ const CompanyForm: React.FC = () => {
               </Card>
             )}
             
-            {companies.map((company) => (
-              <CompanyItem
-                key={company.id}
-                company={company}
-                onChange={updateCompany}
-                onDelete={deleteCompany}
-              />
+            {companies.map((company, index) => (
+              <div key={company.id} ref={index === companies.length - 1 ? lastCompanyRef : null}>
+                <CompanyItem
+                  company={company}
+                  onChange={updateCompany}
+                  onDelete={deleteCompany}
+                />
+              </div>
             ))}
-            
-            {/* Elemento de referência para o final da lista de empresas */}
-            <div ref={endOfCompaniesRef}></div>
             
             {/* Botão adicional para adicionar mais empresas */}
             {companies.length > 0 && (
