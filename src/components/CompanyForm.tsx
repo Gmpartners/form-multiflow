@@ -3,51 +3,54 @@ import React, { useState, useEffect } from "react";
 import { CompanyWithSectors, Sector, SectorField } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Building } from "lucide-react";
+import { Plus, Building, ArrowRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import CompanyItem from "./CompanyItem";
 import { supabase } from "@/integrations/supabase/client";
+import SuccessMessage from "./SuccessMessage";
 
 const CompanyForm: React.FC = () => {
   const { toast } = useToast();
   const [companies, setCompanies] = useState<CompanyWithSectors[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [totalSaved, setTotalSaved] = useState({ companies: 0, sectors: 0 });
 
   // Carregar dados do Supabase quando o componente for montado
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Buscar todos os registros
-        const { data, error } = await supabase
-          .from('companies_with_sectors')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        // Garantir que setores seja um array
-        const formattedData = data.map(item => ({
-          ...item,
-          setores: Array.isArray(item.setores) ? item.setores : []
-        }));
-        
-        setCompanies(formattedData);
-      } catch (error: any) {
-        toast({
-          title: "Erro ao carregar dados",
-          description: error.message || "Não foi possível carregar as empresas.",
-          variant: "destructive",
-        });
-        console.error("Erro ao buscar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [toast]);
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Buscar todos os registros
+      const { data, error } = await supabase
+        .from('companies_with_sectors')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Garantir que setores seja um array
+      const formattedData = data.map(item => ({
+        ...item,
+        setores: Array.isArray(item.setores) ? item.setores : []
+      }));
+      
+      setCompanies(formattedData);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar dados",
+        description: error.message || "Não foi possível carregar as empresas.",
+        variant: "destructive",
+      });
+      console.error("Erro ao buscar dados:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addCompany = () => {
     const newCompany: CompanyWithSectors = {
@@ -90,6 +93,12 @@ const CompanyForm: React.FC = () => {
 
   const deleteCompany = (id: string) => {
     setCompanies(companies.filter((company) => company.id !== id));
+  };
+
+  const resetForm = () => {
+    if (window.confirm("Tem certeza que deseja limpar o formulário? Todos os dados não salvos serão perdidos.")) {
+      setCompanies([]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -157,16 +166,25 @@ const CompanyForm: React.FC = () => {
         }
       }
       
-      toast({
-        title: "Dados salvos com sucesso",
-        description: `${companies.length} empresas e ${companies.reduce(
-          (total, company) => total + company.setores.length,
-          0
-        )} setores registrados com sucesso!`,
+      // Calcular o total de setores
+      const totalSectors = companies.reduce(
+        (total, company) => total + company.setores.length, 0
+      );
+      
+      // Armazenar totais para exibir na mensagem de sucesso
+      setTotalSaved({
+        companies: companies.length,
+        sectors: totalSectors
       });
       
-      // Recarregar os dados para ter os IDs atualizados
-      window.location.reload();
+      // Mostrar a mensagem de sucesso com animação
+      setShowSuccess(true);
+      
+      // Depois de 5 segundos, recarregar os dados e esconder a mensagem
+      setTimeout(() => {
+        setShowSuccess(false);
+        fetchData();  // Recarregar dados do banco
+      }, 5000);
       
     } catch (error: any) {
       toast({
@@ -180,23 +198,57 @@ const CompanyForm: React.FC = () => {
     }
   };
 
+  // Se estiver mostrando a mensagem de sucesso, renderizar apenas ela
+  if (showSuccess) {
+    return (
+      <SuccessMessage 
+        totalCompanies={totalSaved.companies} 
+        totalSectors={totalSaved.sectors}
+        onReset={() => {
+          setShowSuccess(false);
+          setCompanies([]);
+        }}
+      />
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 fade-in">
+    <form 
+      onSubmit={handleSubmit} 
+      className="space-y-8 fade-in"
+      // Evitar submissão acidental ao pressionar Enter
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+          e.preventDefault();
+        }
+      }}
+    >
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-primary">
             Empresas e Setores
           </h2>
-          <Button
-            type="button"
-            onClick={addCompany}
-            className="flex items-center bg-primary hover:bg-primary/90 shadow-md"
-            disabled={loading || saving}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            <Building className="h-4 w-4 mr-2" />
-            Adicionar Empresa
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              type="button"
+              onClick={resetForm}
+              className="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700"
+              disabled={loading || saving || companies.length === 0}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Limpar
+            </Button>
+            <Button
+              type="button"
+              onClick={addCompany}
+              className="flex items-center bg-primary hover:bg-primary/90 shadow-md"
+              disabled={loading || saving}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              <Building className="h-4 w-4 mr-2" />
+              Adicionar Empresa
+            </Button>
+          </div>
         </div>
         
         {loading ? (

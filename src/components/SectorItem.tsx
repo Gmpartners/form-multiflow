@@ -127,7 +127,7 @@ const SectorItem: React.FC<SectorItemProps> = ({ setor, onChange, onDelete }) =>
                 placeholder="nome do lead, email, problema, etc."
                 value={newField}
                 onChange={(e) => setNewField(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addField()}
+                // Removido o evento onKeyDown para evitar adição acidental ao pressionar Enter
                 className="input-focus border-gray-300"
               />
               <Button 
@@ -152,6 +152,7 @@ const SectorItem: React.FC<SectorItemProps> = ({ setor, onChange, onDelete }) =>
                   >
                     {field.name}
                     <button
+                      type="button" // Adicionado type="button" para evitar submissão do formulário
                       onClick={() => removeField(index)}
                       className="ml-1 bg-secondary-foreground/10 rounded-full h-4 w-4 flex items-center justify-center hover:bg-secondary-foreground/20 transition-colors"
                       aria-label={`Remover campo ${field.name}`}
