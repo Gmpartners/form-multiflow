@@ -17,11 +17,16 @@ const CompanyForm: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [totalSaved, setTotalSaved] = useState({ companies: 0, sectors: 0 });
   const lastCompanyRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Removido carregamento automático dos dados do Supabase
   // O formulário inicia vazio para todos os usuários
 
-  const addCompany = () => {
+  const addCompany = (e: React.MouseEvent) => {
+    // Prevenir comportamento padrão para garantir que o evento não se propague
+    e.preventDefault();
+    e.stopPropagation();
+    
     const newCompany: CompanyWithSectors = {
       id: `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       empresa_nome: "",
@@ -70,7 +75,11 @@ const CompanyForm: React.FC = () => {
     setCompanies(companies.filter((company) => company.id !== id));
   };
 
-  const resetForm = () => {
+  const resetForm = (e: React.MouseEvent) => {
+    // Prevenir comportamento padrão
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (window.confirm("Tem certeza que deseja limpar o formulário? Todos os dados não salvos serão perdidos.")) {
       setCompanies([]);
     }
@@ -78,6 +87,7 @@ const CompanyForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Removida a validação obrigatória dos campos
     
@@ -174,12 +184,14 @@ const CompanyForm: React.FC = () => {
 
   return (
     <form 
+      ref={formRef}
       onSubmit={handleSubmit} 
       className="space-y-6 fade-in"
       // Evitar submissão acidental ao pressionar Enter
       onKeyDown={(e) => {
-        if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+        if (e.key === 'Enter' && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
           e.preventDefault();
+          e.stopPropagation();
         }
       }}
     >

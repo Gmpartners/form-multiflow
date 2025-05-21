@@ -15,7 +15,11 @@ interface CompanyItemProps {
 }
 
 const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }) => {
-  const addSetor = () => {
+  const addSetor = (e: React.MouseEvent) => {
+    // Prevenir comportamento padrão para garantir que o evento não se propague
+    e.preventDefault();
+    e.stopPropagation();
+    
     const newSetor: Sector = {
       id: `setor-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       nome: "",
@@ -50,6 +54,7 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
       <CardHeader className="bg-gradient-to-r from-secondary/70 to-secondary/20 pb-3 sm:pb-4 relative p-3 sm:p-4">
         <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             onClick={() => onDelete(company.id)}
@@ -101,6 +106,7 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
               </h3>
             </div>
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={addSetor}
