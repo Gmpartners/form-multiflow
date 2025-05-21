@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CompanyWithSectors, Sector, SectorField } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ const CompanyForm: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [totalSaved, setTotalSaved] = useState({ companies: 0, sectors: 0 });
+  const endOfCompaniesRef = useRef<HTMLDivElement>(null);
 
   // Carregar dados do Supabase quando o componente for montado
   useEffect(() => {
@@ -63,12 +64,19 @@ const CompanyForm: React.FC = () => {
     // Adicionar a nova empresa ao final do array (no final da lista)
     setCompanies([...companies, newCompany]);
     
-    // Rolar para o fim da página para mostrar a nova empresa
+    // Usar um timeout para esperar o DOM ser atualizado
     setTimeout(() => {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth'
-      });
+      // Scroll suave até o final da lista de empresas (usando o ref)
+      if (endOfCompaniesRef.current) {
+        // Calcular a posição para um scroll suave
+        const yOffset = -100; // Ajustar conforme necessário para ver um pouco do contexto acima
+        const y = endOfCompaniesRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        
+        window.scrollTo({
+          top: y,
+          behavior: 'smooth'
+        });
+      }
     }, 100);
   };
 
@@ -287,6 +295,9 @@ const CompanyForm: React.FC = () => {
                 onDelete={deleteCompany}
               />
             ))}
+            
+            {/* Elemento de referência para o final da lista de empresas */}
+            <div ref={endOfCompaniesRef}></div>
             
             {/* Botão adicional para adicionar mais empresas */}
             {companies.length > 0 && (
