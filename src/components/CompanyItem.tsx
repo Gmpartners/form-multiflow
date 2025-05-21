@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Company, Sector } from "@/types";
+import { Company, Sector, SectorField } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const CompanyItem: React.FC<CompanyItemProps> = ({ company, onChange, onDelete }
       name: "",
       description: "",
       whenToTransfer: "",
-      fields: "",
+      fields: [],
       responsiblePerson: "",
     };
     

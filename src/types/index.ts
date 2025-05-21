@@ -1,10 +1,15 @@
 
+export interface SectorField {
+  id: string;
+  name: string;
+}
+
 export interface Sector {
   id: string;
   name: string;
   description: string;
   whenToTransfer: string;
-  fields: string;
+  fields: SectorField[];
   responsiblePerson: string;
 }
 
